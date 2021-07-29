@@ -174,8 +174,7 @@
 			system("Pause"); std::cout << std::endl;
 			createRoom();
 			break;
-			/////////////////////////////////Магазин
-			////////////////   !!НЕОБХОДИМА ДОРАБОТКА!!    ////////////
+			/////////////////////////////////Магазин			
 		case Rooms::SHOP:
 			static std::vector<Assortment> stock{ Assortment::GREAT_HAMMER, Assortment::HEAL_POTION, Assortment::RUNE_OF_ACCURACY };
 			std::cout << "Незатейливый дряхлый старик пристально смотрит на Вас.\nОн предлагает что-нибудь у него купить." << std::endl;
@@ -191,7 +190,7 @@
 			do {
 				std::cout << "\nЧто хотите приобрести? (Введите номер товара, либо 0 для выхода): ";
 				std::cin >> choice;
-				if (std::cin.fail()) {
+				if (std::cin.fail() || choice > stock.size()) {
 					std::cin.clear();
 					std::cin.ignore(32000, '\n');
 					continue;
