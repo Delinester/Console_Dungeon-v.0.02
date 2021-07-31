@@ -46,6 +46,7 @@ public:
 
 	bool getInput() {
 		std::string input;
+		std::cout << "В какую сторону двигаемся?(w, a, s, d) + ENTER\n";
 		std::cin >> input;
 		if (input == "w") { changePlayerXPos(-1); return true; }
 		if (input == "s") { changePlayerXPos(1); return true; }

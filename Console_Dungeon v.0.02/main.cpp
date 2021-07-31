@@ -7,9 +7,11 @@ int main() {
 	rand();
 	setlocale(LC_ALL, "Russian");
 	Game game;
-	game.createCharacter();
 	Game* gameObj = &game;
 	RoomGenerator generator(gameObj);
+
+	game.startGame();
+	generator.selectSize();
 	generator.createRoom();
 
 	return 0;

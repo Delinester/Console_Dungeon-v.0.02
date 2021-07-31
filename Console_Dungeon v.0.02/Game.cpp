@@ -1,8 +1,24 @@
 #include "Game.h"
 
-
+void Game::startGame() {
+	std::string choice;
+	do {
+		std::cout << "Хотите прочитать справку об игре? (1 - да, 0 - нет)";
+		std::cin >> choice;
+	} while (choice != "1" && choice != "0");
+	if (choice == "0") createCharacter();
+	if (choice == "1") {
+		std::cout << "Вы появляетесь в комнате. Ваша задача - очистить комнату от ВСЕХ монстров.\n";
+		std::cout << "Комнаты вместе с сокровищами, ловушками и монстрами генерируются случайным образом.\n";
+		std::cout << "Для передвижения по комнате использвуйте (w, a, s, d) + ENTER\n";
+		std::cout << "Обозначения:\n@ - Ваш персонаж\nE - враг\n¤ - предмет, который может дать что-то полезное или окажется ловушкой\n";
+		system("Pause");
+		createCharacter();
+	}
+}
 	//Создание персонажа, выбор имени и оружия
 	void Game::createCharacter() {
+		system("CLS");
 		std::cout << gameVersion;
 		player.setName();
 		system("CLS");
@@ -27,7 +43,6 @@
 		system("CLS");
 		std::cout << "Итак, " << player.getPlayerName() << ", у Вас в руках " << player.getWeaponName() <<
 			". Вы полны сил, у Вас " << player.getPlayerHealth() << " очков здоровья\n";
-		std::cout << "Взяв волю в кулак, Вы входите в темную крипту...\n\n";
 		system("Pause");
 	}
 	//Спавн монстра с предварительным его описанием

@@ -3,6 +3,7 @@
 #include <vector>
 #include "Player.h"
 #include "Enemy.h"
+#include <string>
 
 class Game {
 public:
@@ -16,6 +17,7 @@ public:
 	std::string gameVersion = "Console Dungeon v 0.03\nChangelog:\n1.Added room drawing\n";
 	int roomNum = 0;
 public:
+	void startGame();
 	//Создание персонажа, выбор имени и оружия
 	void createCharacter();
 	//Спавн монстра с предварительным его описанием

@@ -25,10 +25,10 @@ public:
 		RUNE_OF_ACCURACY = 500
 	};
 private:
-	const int minRoomWidth = 10;
-	const int minRoomLength = 10;
-	const int maxRoomWidth = 60;
-	const int maxRoomLength = 30;
+	int minRoomWidth = 10;
+	int minRoomLength = 10;
+	int maxRoomWidth = 60;
+	int maxRoomLength = 30;
 	int currentRoomWidth, currentRoomLength;
 	int currentMonstersInRoom = 0;
 	Game* m_gamePtr;
@@ -77,7 +77,7 @@ private:
 		do {
 			std::cout << "\nЧто хотите приобрести? (Введите номер товара, либо 0 для выхода): ";
 			std::cin >> choice;
-			if (std::cin.fail() || choice > stock.size() || choice < 0) {
+			if (std::cin.fail() || choice > stock.size() || choice <= 0) {
 				std::cin.clear();
 				std::cin.ignore(32000, '\n');
 				continue;
@@ -90,7 +90,7 @@ private:
 				m_gamePtr->player.changeCoins(-static_cast<int>(stock[choice - 1]));
 				m_gamePtr->player.setWeapon(Weapon::WeaponTypes::GREAT_HAMMER);
 				std::cout << "Теперь у Вас в руках " << m_gamePtr->player.getWeaponName() << std::endl;
-				stock.erase(stock.begin() + choice - 1);
+				stock.erase(stock.begin() + (choice - 1));
 				system("Pause");
 				break;
 			}
@@ -106,7 +106,7 @@ private:
 				m_gamePtr->player.changeCoins(-static_cast<int>(stock[choice - 1]));
 				m_gamePtr->player.setWeaponAccuracy(1);
 				std::cout << "Вы вставили руну меткости в Ваше текущее оружие(" << m_gamePtr->player.getWeaponName() << ")...\n";
-				stock.erase(stock.begin() + choice - 1);
+				stock.erase(stock.begin() + (choice - 1));
 				system("Pause");
 				break;
 			}
@@ -116,10 +116,11 @@ private:
 public:
 	void createRoom() {
 		m_gamePtr->roomNum++;
-		if (m_gamePtr->roomNum % 2 == 0 && m_gamePtr->roomNum != 1) { spawnShop(); return; }
+		if (m_gamePtr->roomNum % 3 == 0 && m_gamePtr->roomNum > 1) { spawnShop(); return; }
 		int currentRoomLength = Random::randomize(minRoomLength, maxRoomLength);
 		int currentRoomWidth = Random::randomize(minRoomWidth, maxRoomWidth);
 		std::vector<std::vector<char>> room((currentRoomLength), std::vector<char>(currentRoomWidth));
+		m_gamePtr->player.movePlayerTo(currentRoomLength / 2, currentRoomWidth / 2);
 		for (int x = 0; x < currentRoomLength; x++) {
 			for (int y = 0; y < currentRoomWidth; y++) {
 				if (x == 0 || x == currentRoomLength - 1) room[x][y] = '-';
@@ -127,6 +128,7 @@ public:
 				else room[x][y] = '.';
 			}
 		}
+		room[m_gamePtr->player.getPlayerXPos()][m_gamePtr->player.getPlayerYPos()] = '@';
 		for (int i = 1, itemsAmount = (currentRoomLength + currentRoomWidth) / 3; i <= itemsAmount; i++) {
 			int x = Random::randomize(0, currentRoomLength - 1), y = Random::randomize(0, currentRoomWidth - 1);
 			if (room[x][y] != '@' && room[x][y] != '|' && room[x][y] != '-' && 
@@ -142,7 +144,6 @@ public:
 			}
 			else i--;
 		}
-		room[m_gamePtr->player.getPlayerXPos()][m_gamePtr->player.getPlayerYPos()] = '@';
 		do {
 			system("CLS");
 			for (int x = 0; x < currentRoomLength; x++) {
@@ -151,7 +152,7 @@ public:
 				}
 				std::cout << std::endl;
 			}
-			std::cout << "В какую сторону двигаемся?\n";
+			if (currentMonstersInRoom == 0) std::cout << "Открылся проход в следующую комнату...###\n";
 			int tempX = m_gamePtr->player.getPlayerXPos();
 			int tempY = m_gamePtr->player.getPlayerYPos();
 			if (m_gamePtr->player.getInput() == true && room[m_gamePtr->player.getPlayerXPos()][m_gamePtr->player.getPlayerYPos()] != '|' &&
@@ -159,6 +160,11 @@ public:
 				if (room[m_gamePtr->player.getPlayerXPos()][m_gamePtr->player.getPlayerYPos()] == 'E') {
 					m_gamePtr->monsterSpawn();
 					currentMonstersInRoom--;
+					if (currentMonstersInRoom == 0) {
+						room[currentRoomLength / 2 - 1][currentRoomWidth - 1] = '#';
+						room[currentRoomLength / 2][currentRoomWidth - 1] = '#';
+						room[currentRoomLength / 2 + 1][currentRoomWidth - 1] = '#';
+					}
 				}
 				if (room[m_gamePtr->player.getPlayerXPos()][m_gamePtr->player.getPlayerYPos()] == '¤') {
 					FloorItem item = static_cast<FloorItem>(Random::randomize(0, static_cast<int>(FloorItem::MAX_ITEMS) - 1));
@@ -168,13 +174,31 @@ public:
 					case FloorItem::TREASURE: treasureFound(); break;
 					}
 				}
+				if (room[m_gamePtr->player.getPlayerXPos()][m_gamePtr->player.getPlayerYPos()] == '#') { continue; }
 				room[m_gamePtr->player.getPlayerXPos()][m_gamePtr->player.getPlayerYPos()] = '@';
 				room[tempX][tempY] = '.';
 			}
 			else m_gamePtr->player.movePlayerTo(tempX, tempY);
 			
-		} while (currentMonstersInRoom != 0);	
+		} while (room[m_gamePtr->player.getPlayerXPos()][m_gamePtr->player.getPlayerYPos()] != '#');
+		
 		createRoom();
+	}
+	void selectSize() {
+		short choice;
+		do {
+			std::cout << "В какое подземелье Вы отправитесь? \n1 - Храм\n2 - Катакомбы\n3 - Склеп\n";
+			std::cin >> choice;
+			if (std::cin.fail()) {
+				std::cin.clear();
+				std::cin.ignore(32000, '\n');
+				continue;
+			}
+			if (choice == 1) { maxRoomWidth = 60; minRoomWidth = 20; maxRoomLength = 35; minRoomLength = 10; std::cout << "Вы пошли в ХРАМ\n"; }
+			if (choice == 2) { maxRoomWidth = 35; minRoomWidth = 15; maxRoomLength = 25; minRoomLength = 8; std::cout << "Вы пошли в КАТАКОМБЫ\n"; }
+			if (choice == 3) { maxRoomWidth = 20; minRoomWidth = 10; maxRoomLength = 10; minRoomLength = 5; std::cout << "Вы пошли в СКЛЕП\n"; }
+		} while (choice != 1 && choice != 2 && choice != 3);
+		system("Pause");
 	}
 };
 
