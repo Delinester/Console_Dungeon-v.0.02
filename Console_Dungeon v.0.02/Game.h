@@ -3,36 +3,17 @@
 #include <vector>
 #include "Player.h"
 #include "Enemy.h"
+
 class Game {
 public:
-	enum class Rooms {
-		MONSTERS = 1,
-		TREASURE,
-		TRAP,
-		MAX_ROOMS,
-		SHOP
-	};
-	enum class Treasures {
-		COINS,
-		HEAL_POTION,
-		MAX_TREASURES
-	};
-	enum class Items {
-		HEAL_POTION,
-		MAX_ITEMS
-	};
 	enum class FirstAttack {
 		ENEMY,
 		PLAYER,
 	};
-	enum class Assortment {
-		NOTHING,
-		GREAT_HAMMER = 100,
-		HEAL_POTION = 30,
-		RUNE_OF_ACCURACY = 500
-	};
-private:
+	
+public:
 	Player player;
+	std::string gameVersion = "Console Dungeon v 0.03\nChangelog:\n1.Added room drawing\n";
 	int roomNum = 0;
 public:
 	//Создание персонажа, выбор имени и оружия
@@ -42,7 +23,8 @@ public:
 	void enemyBattle(Enemy& enemy);
 	void gameOver(Enemy enemy);
 	//Генерация случайной комнаты
-	void createRoom();
+	
+
 	
 };
 

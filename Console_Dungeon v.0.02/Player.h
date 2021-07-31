@@ -4,6 +4,7 @@
 #include "Constants.h"
 #include "Random.h"
 #include "Weapon.h"
+#include "Point2D.h"
 class Player {
 private:
 	//Выдаем рандомное кол-во здоровья от 100 до 150
@@ -11,8 +12,11 @@ private:
 	int m_coins = 0;
 	std::string m_name;
 	Weapon m_weapon;
+	Point2D m_position;
 public:
-	Player() {}
+	Player() {
+		m_position.moveTo(10, 10);
+	}
 	//Сеттер для имени
 	void setName() {
 		std::cout << "Назовите своего персонажа (на английском): ";
@@ -34,6 +38,22 @@ public:
 	const int getPlayerHealth() const { return m_health; }
 	void setWeaponAccuracy(int maxHitChance) { m_weapon.setMaxHitChance(maxHitChance); }
 
+	void changePlayerXPos(int x) { m_position.changePosByX(x); }
+	void changePlayerYPos(int y) { m_position.changePosByY(y); }
+	void movePlayerTo(int x, int y) { m_position.moveTo(x, y); }
+	int getPlayerXPos() const { return m_position.getX(); }
+	int getPlayerYPos() const { return m_position.getY(); }
+
+	bool getInput() {
+		std::string input;
+		std::cin >> input;
+		if (input == "w") { changePlayerXPos(-1); return true; }
+		if (input == "s") { changePlayerXPos(1); return true; }
+		if (input == "a") { changePlayerYPos(-1); return true; }
+		if (input == "d") { changePlayerYPos(1); return true; }
+		return false;
+	}
 	int dealDamage();
+	
 };
 

@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "RoomGenerator.h"
 #include <cstdlib>
 
 int main() {
@@ -7,7 +8,9 @@ int main() {
 	setlocale(LC_ALL, "Russian");
 	Game game;
 	game.createCharacter();
-	game.createRoom();
+	Game* gameObj = &game;
+	RoomGenerator generator(gameObj);
+	generator.createRoom();
 
 	return 0;
 }

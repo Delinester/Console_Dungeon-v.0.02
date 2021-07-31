@@ -22,6 +22,7 @@ private:
 	EnemyTypes m_type = static_cast<EnemyTypes>(Random::randomize(0, static_cast<int>(EnemyTypes::MAX_ENEMY_TYPES) - 1));
 	int m_baseDamage;
 	int m_dropCoins;
+	
 public:	
 	Enemy(EnemyTypes type) : m_type(type) {
 		if (m_type == EnemyTypes::TRAP) m_name = "Острый камень";

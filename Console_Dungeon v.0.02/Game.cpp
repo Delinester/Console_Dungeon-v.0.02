@@ -3,6 +3,7 @@
 
 	//Создание персонажа, выбор имени и оружия
 	void Game::createCharacter() {
+		std::cout << gameVersion;
 		player.setName();
 		system("CLS");
 		std::cout << player.getPlayerName() << " - отважный искатель приключений, решивший отправиться в одиночку в жуткое подземелье.\n";
@@ -32,7 +33,7 @@
 	//Спавн монстра с предварительным его описанием
 	void Game::monsterSpawn() {
 		Enemy enemy;
-		std::cout << "Долго бродив по старинной крипте, Вы заходите в комнату, из которой издаются странные звуки...\n\n";
+		system("CLS");
 		switch (enemy.getEnemyType()) {
 		case Enemy::EnemyTypes::SPIDER:
 			std::cout << "Посмотрев на высокий потолок, Вы замечаете черные очертания. Кто или что это могло бы быть?\n";
@@ -124,7 +125,7 @@
 			} while (enemy.getEnemyHealth() > 0);
 		}
 		////////////////////////////////////
-		createRoom();
+		
 	}
 	//Смерть игрока
 	void Game::gameOver(Enemy enemy) {
@@ -135,98 +136,7 @@
 		system("Pause"); std::cout << std::endl;
 		exit(0);
 	}
-	//Генерация случайной комнаты
-	void Game::createRoom() {
-		roomNum++;
-		Rooms room = static_cast<Rooms>(Random::randomize(1, static_cast<int>(Rooms::MAX_ROOMS) - 1));
-		if (roomNum >= 10 && roomNum % 10 == 0) room = Rooms::SHOP;
-		system("CLS");
-		switch (room) {
-		case Rooms::MONSTERS:
-			monsterSpawn();
-		case Rooms::TREASURE:
-		{Treasures treasure = static_cast<Treasures>(Random::randomize(0, static_cast<int>(Treasures::MAX_TREASURES) - 1));
-		switch (treasure) {
-		case Treasures::COINS:
-			player.changeCoins(Random::randomize(10, 25));
-			std::cout << "Вы входите в освещенную комнату, посередине которой стоит сундук...\n";
-			std::cout << "Вы нашли сокровище! Теперь Ваш баланс равен " << player.getPlayerCoins() << std::endl << std::endl;
-			system("Pause");
-			createRoom();
-			break;
-		case Treasures::HEAL_POTION:
-			player.changeHealth(Random::randomize(15, 30));
-			std::cout << "Вы входите в освещенную комнату, посередине которой стоит сундук...\n";
-			std::cout << "Вы нашли бутылек с лекарством! Вам стало лучше, здоровье увеличилось до "
-				<< player.getPlayerHealth() << " очков." << std::endl << std::endl;
-			system("Pause");
-			createRoom();
-			break;
-		}
-		break;
-		}
-		case Rooms::TRAP:
-			player.changeHealth(Random::randomize(-12, -6));
-			std::cout << "Бродя по мрачным и сырым коридорам, Вы случайно наступаете на нажимную плиту.\n";
-			std::cout << "Вдалеке слышен скрежет механизмов.\nВнезапно из щели в стене в Вас вонзается что-то острое.\n";
-			std::cout << "Вы чувствуете себя хуже. Ваш запас здоровья снизился до " << player.getPlayerHealth() << " очков\n\n";
-			if (player.getPlayerHealth() <= 0) gameOver(Enemy(Enemy::EnemyTypes::TRAP));
-			system("Pause"); std::cout << std::endl;
-			createRoom();
-			break;
-			/////////////////////////////////Магазин			
-		case Rooms::SHOP:
-			static std::vector<Assortment> stock{ Assortment::GREAT_HAMMER, Assortment::HEAL_POTION, Assortment::RUNE_OF_ACCURACY };
-			std::cout << "Незатейливый дряхлый старик пристально смотрит на Вас.\nОн предлагает что-нибудь у него купить." << std::endl;
-			std::cout << "У Вас " << player.getPlayerCoins() << " монет.\n";
-			std::cout << "У него на прилавке лежит: " << std::endl;
-			for (int i = 1; i <= stock.size(); i++) {
-				std::cout << i << '.';
-				if (stock[i - 1] == Assortment::GREAT_HAMMER) std::cout << "Божественный молот(100 монет)\n";
-				if (stock[i - 1] == Assortment::HEAL_POTION) std::cout << "Зелье исцеления(30 монет)\n";
-				if (stock[i - 1] == Assortment::RUNE_OF_ACCURACY) std::cout << "Руна точности(500 монет)\n";
-			}
-			short choice;
-			do {
-				std::cout << "\nЧто хотите приобрести? (Введите номер товара, либо 0 для выхода): ";
-				std::cin >> choice;
-				if (std::cin.fail() || choice > stock.size()) {
-					std::cin.clear();
-					std::cin.ignore(32000, '\n');
-					continue;
-				}
-				if (static_cast<int>(stock[choice - 1]) > player.getPlayerCoins()) {
-					std::cout << "\"Денег маловато\" - проговорил хриплым голосом старик...";
-					continue;
-				}
-				if (stock[choice - 1] == Assortment::GREAT_HAMMER) {
-					player.changeCoins(-static_cast<int>(stock[choice - 1]));
-					player.setWeapon(Weapon::WeaponTypes::GREAT_HAMMER);
-					std::cout << "Теперь у Вас в руках " << player.getWeaponName() << std::endl;
-					stock.erase(stock.begin() + choice - 1);
-					system("Pause");
-					break;
-				}
-				if (stock[choice - 1] == Assortment::HEAL_POTION) {
-					player.changeCoins(-static_cast<int>(stock[choice - 1]));
-					player.changeHealth(40);
-					std::cout << "Вы пьете зелье исцеления и восстанавливаете 40 единиц здоровья."
-						<< "Теперь у Вас " << player.getPlayerHealth() << " очков здоровья.\n";
-					system("Pause");
-					break;
-				}
-				if (stock[choice - 1] == Assortment::RUNE_OF_ACCURACY) {
-					player.changeCoins(-static_cast<int>(stock[choice - 1]));
-					player.setWeaponAccuracy(1);
-					std::cout << "Вы вставили руну меткости в Ваше текущее оружие(" << player.getWeaponName() << ")...\n";
-					stock.erase(stock.begin() + choice - 1);
-					system("Pause");
-					break;
-				}
-			} while (choice != 0);
-			createRoom();
-		}
-		////////////////////////////////////////////////////////////////////
-	}
+	
+	
 
 
